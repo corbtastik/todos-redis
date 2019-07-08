@@ -1,3 +1,6 @@
+todos:
+  api:
+    limit: 1024
 spring:
   application:
     name: todos-redis
