@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.OK
 import org.springframework.util.ObjectUtils
 import org.springframework.util.StringUtils
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -12,8 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.util.UUID
@@ -27,6 +31,7 @@ class TodosAPI(@Autowired @Qualifier("todosRepo") val repo: TodosRepo,
         return this.repo.findAll().toList()
     }
 
+    @ResponseStatus(CREATED)
     @PostMapping("/")
     fun create(@RequestBody todo: Todo): Todo {
         throwIfOverLimit()
@@ -39,6 +44,15 @@ class TodosAPI(@Autowired @Qualifier("todosRepo") val repo: TodosRepo,
             createObject.complete = todo.complete
         }
         return this.repo.save(createObject)
+    }
+
+    @ResponseStatus(OK)
+    @PutMapping("/")
+    fun put(@RequestBody todo: Todo): Todo {
+        if(todo.id == null) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "todos.id cannot be null on put")
+        }
+        return this.repo.save(todo)
     }
 
     @PostMapping("/load/{size}")
