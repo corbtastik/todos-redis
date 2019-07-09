@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -47,10 +46,13 @@ class TodosAPI(@Autowired @Qualifier("todosRepo") val repo: TodosRepo,
     }
 
     @ResponseStatus(OK)
-    @PutMapping("/")
-    fun put(@RequestBody todo: Todo): Todo {
+    @PostMapping("/{id}")
+    fun put(@PathVariable id: String, @RequestBody todo: Todo): Todo {
         if(todo.id == null) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "todos.id cannot be null on put")
+        }
+        if(todo.id != id) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "todos.id ${todo.id} and id $id are inconsistent")
         }
         return this.repo.save(todo)
     }
