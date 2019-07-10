@@ -35,7 +35,11 @@ class TodosAPI(@Autowired @Qualifier("todosRepo") val repo: TodosRepo,
     fun create(@RequestBody todo: Todo): Todo {
         throwIfOverLimit()
         val createObject = Todo()
-        createObject.id = UUID.randomUUID().toString()
+        if(ObjectUtils.isEmpty(todo.id)) {
+            createObject.id = UUID.randomUUID().toString()
+        } else {
+            createObject.id = todo.id
+        }
         if(!ObjectUtils.isEmpty(todo.title)) {
             createObject.title = todo.title
         }
